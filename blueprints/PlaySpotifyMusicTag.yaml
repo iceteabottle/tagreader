@@ -1,0 +1,39 @@
+blueprint:
+  name: Play Spotify Music Tag
+  description: Play Spotify music tag with Spotify uri
+  domain: automation
+  input:
+    reader_id:
+      name: ESPHome NFC reader device
+      description: This is your NFC reader
+      selector:
+        device:
+          integration: esphome
+    player:
+      name: Media Player
+      description: This is your cast media player for this reader
+      selector:
+        entity:
+          domain: media_player
+
+variables:
+    device_id: !input reader_id
+    reader: '{{ device_attr(device_id, "name") }}'
+
+trigger:
+  - platform: event
+    event_type: esphome.music_tag
+
+condition:
+  - condition: template
+    value_template: '{{ trigger.event.data.reader.lower() == reader.lower() }}'
+
+action:
+  - action: spotcast.start
+    data:
+      entity_id: !input player
+      uri: "{{ trigger.event.data.url }}"
+      random_song: true
+
+mode: queued
+max: 10
