@@ -1,6 +1,6 @@
 blueprint:
-  name: Play Spotify Music Tag
-  description: Play Spotify music tag with Spotify uri
+  name: Play Spotify Music Tag on a cast device
+  description: Play Spotify music tag with Spotify uri on a cast device
   domain: automation
   input:
     reader_id:
