@@ -16,6 +16,12 @@ blueprint:
         entity:
           domain: media_player
           integration: cast
+    shuffle:
+      name: Shuffle
+      description: Enable shuffle mode
+      default: true
+      selector:
+        boolean: {}
 
 variables:
     device_id: !input reader_id
@@ -34,7 +40,7 @@ action:
     data:
       entity_id: !input player
       uri: "{{ trigger.event.data.url }}"
-      random_song: true
+      random_song: !input shuffle
 
 mode: queued
 max: 10
