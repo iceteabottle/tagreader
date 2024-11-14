@@ -15,6 +15,7 @@ blueprint:
       selector:
         entity:
           domain: media_player
+          integration: cast
 
 variables:
     device_id: !input reader_id
