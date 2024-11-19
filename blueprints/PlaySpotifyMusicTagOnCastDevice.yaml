@@ -25,7 +25,6 @@ blueprint:
 
 variables:
     device_id: !input reader_id
-    reader: '{{ device_attr(device_id, "name") }}'
 
 trigger:
   - platform: event
@@ -33,9 +32,9 @@ trigger:
 
 condition:
   - condition: template
-    value_template: '{{ trigger.event.data.reader.lower() == reader.lower() }}'
+    value_template: '{{ trigger.event.data.device_id == device_id }}'
   - condition: template
-    value_template: '{{ trigger.event.data.url.startswith("spotify:") }}'
+    value_template: '{{ trigger.event.data.source == "spotify" }}'
 
 action:
   - action: spotcast.start
