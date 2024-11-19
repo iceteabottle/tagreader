@@ -254,9 +254,9 @@ pn532_i2c:
     - delay: 0.15s #to fix slow component
         
     - lambda: |-
-        id(source)="";
-        id(url)="";
-        id(info)="";
+        id(source) = "";
+        id(url) = "";
+        id(info) = "";
         if (tag.has_ndef_message()) {
           auto message = tag.get_ndef_message();
           auto records = message->get_records();
@@ -266,7 +266,7 @@ pn532_i2c:
 
             if (type == "U") {
               ESP_LOGD("tagreader", "Found URI NDEF");
-              id(url)=payload;
+              id(url) = payload;
 
               std::vector<std::pair<std::string, std::string>> prefixes = {
                 {"https://www.home-assistant.io/tag/", "hass"},
@@ -287,10 +287,9 @@ pn532_i2c:
               };
 
               for (const auto& prefix : prefixes) {
-                if (payload.find(prefix.first) != std::string::npos) {
+                if (payload.find(prefix.first) == 0) {
                   ESP_LOGD("tagreader", "Found %s tag NDEF", prefix.second.c_str());
                   id(source) = prefix.second;
-                  id(url) = payload;
                   if (prefix.second == "hass") {
                     id(info) = payload.substr(prefix.first.length());
                   }
@@ -300,17 +299,17 @@ pn532_i2c:
             }
             else if (type == "T") {
               ESP_LOGD("tagreader", "Found music info tag NDEF");
-              id(info)=payload;
+              id(info) = payload;
             }
-            else if ( id(source)=="" ) {
-              id(source)="uid";
+            else if (id(source) == "") {
+              id(source) = "uid";
             }
           }
         }
         else {
-          id(source)="uid";
+          id(source) = "uid";
         }
-    
+
     - if:
         condition:
           lambda: 'return ( id(source)=="uid" );'
