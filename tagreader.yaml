@@ -32,8 +32,10 @@ esphome:
   # configuration and updates.
   project:
     name: adonno.tag_reader
-    version: "1.4.6"
-# If buzzer is enabled, notify on api connection success
+    version: "1.4.7"
+  
+
+  # If buzzer is enabled, notify on api connection success
   on_boot:
     priority: -10
     then:
@@ -254,9 +256,9 @@ pn532_i2c:
     - delay: 0.15s #to fix slow component
         
     - lambda: |-
-        id(source) = "";
-        id(url) = "";
-        id(info) = "";
+        id(source).clear();
+        id(url).clear();
+        id(info).clear();
         if (tag.has_ndef_message()) {
           auto message = tag.get_ndef_message();
           auto records = message->get_records();
