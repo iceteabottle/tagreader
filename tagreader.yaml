@@ -32,7 +32,7 @@ esphome:
   # configuration and updates.
   project:
     name: adonno.tag_reader
-    version: "1.4.5"
+    version: "1.4.6"
 # If buzzer is enabled, notify on api connection success
   on_boot:
     priority: -10
@@ -268,7 +268,7 @@ pn532_i2c:
               ESP_LOGD("tagreader", "Found URI NDEF");
               id(url) = payload;
 
-              std::vector<std::pair<std::string, std::string>> prefixes = {
+              const char* prefixes[][2] = {
                 {"https://www.home-assistant.io/tag/", "hass"},
                 {"https://music.apple.com", "amusic"},
                 {"spotify:", "spotify"},
@@ -287,26 +287,23 @@ pn532_i2c:
               };
 
               for (const auto& prefix : prefixes) {
-                if (payload.find(prefix.first) == 0) {
-                  ESP_LOGD("tagreader", "Found %s tag NDEF", prefix.second.c_str());
-                  id(source) = prefix.second;
-                  if (prefix.second == "hass") {
-                    id(info) = payload.substr(prefix.first.length());
+                if (payload.find(prefix[0]) == 0) {
+                  ESP_LOGD("tagreader", "Found %s tag NDEF", prefix[1]);
+                  id(source) = prefix[1];
+                  if (strcmp(prefix[1], "hass") == 0) {
+                    id(info) = payload.substr(strlen(prefix[0]));
                   }
                   break;
                 }
               }
-            }
-            else if (type == "T") {
+            } else if (type == "T") {
               ESP_LOGD("tagreader", "Found music info tag NDEF");
               id(info) = payload;
-            }
-            else if (id(source) == "") {
+            } else if (id(source).empty()) {
               id(source) = "uid";
             }
           }
-        }
-        else {
+        } else {
           id(source) = "uid";
         }
 
