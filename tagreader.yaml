@@ -32,7 +32,7 @@ esphome:
   # configuration and updates.
   project:
     name: adonno.tag_reader
-    version: "1.4.3"
+    version: "1.4.10"
 
   # If buzzer is enabled, notify on api connection success
   on_boot:
@@ -255,83 +255,61 @@ pn532_i2c:
     - delay: 0.15s #to fix slow component
         
     - lambda: |-
-        id(source)="";
-        id(url)="";
-        id(info)="";
+        id(source).clear();
+        id(url).clear();
+        id(info).clear();
         if (tag.has_ndef_message()) {
           auto message = tag.get_ndef_message();
           auto records = message->get_records();
           for (auto &record : records) {
-            std::string payload = record->get_payload();
-            std::string type = record->get_type();
+            const char* payload = record->get_payload().c_str();
+            const char* type = record->get_type().c_str();
 
-            ESP_LOGD("tagreader", "Payload: %s", payload.c_str());
-            ESP_LOGD("tagreader", "Type: %s", type.c_str());
+            ESP_LOGD("tagreader", "Payload: %s", payload);
+            ESP_LOGD("tagreader", "Type: %s", type);
 
-            size_t hass = payload.find("https://www.home-assistant.io/tag/");
-            size_t applemusic = payload.find("https://music.apple.com");
-            size_t spotify = payload.find("spotify:");
-            size_t sonos = payload.find("sonos-2://");
-
-            size_t mass_deezer = payload.find("deezer://");
-            size_t mass_filesystem_local = payload.find("filesystem_local://");
-            size_t mass_filesystem_smb = payload.find("filesystem_smb://");
-            size_t mass_plex = payload.find("plex://");
-            size_t mass_qobuz = payload.find("qobuz://");
-            size_t mass_radiobrowser = payload.find("radiobrowser://");
-            size_t mass_soundcloud = payload.find("soundcloud://");
-            size_t mass_spotify = payload.find("spotify://");
-            size_t mass_tidal = payload.find("tidal://");
-            size_t mass_tunein = payload.find("tunein://");
-            size_t mass_ytmusic = payload.find("ytmusic://");
-
-            if (type == "U" and hass != std::string::npos ) {
-              ESP_LOGD("tagreader", "Found Home Assistant tag NDEF");
-              id(source)="hass";
-              id(url)=payload;
-              id(info)=payload.substr(hass + 34);
-            }
-            else if (type == "U" and applemusic != std::string::npos ) {
-              ESP_LOGD("tagreader", "Found Apple Music tag NDEF");
-              id(source)="amusic";
-              id(url)=payload;
-            }
-            else if (type == "U" and spotify != std::string::npos ) {
-              ESP_LOGD("tagreader", "Found Spotify tag NDEFx");
-              id(source)="spotify";
-              id(url)=payload;
-            }
-            else if (type == "U" and sonos != std::string::npos ) {
-              ESP_LOGD("tagreader", "Found Sonos app tag NDEF");
-              id(source)="sonos";
-              id(url)=payload;
-            }
-            else if (type == "U" && (mass_deezer != std::string::npos ||
-                    mass_filesystem_local != std::string::npos ||
-                    mass_filesystem_smb != std::string::npos ||
-                    mass_plex != std::string::npos ||
-                    mass_qobuz != std::string::npos ||
-                    mass_radiobrowser != std::string::npos ||
-                    mass_soundcloud != std::string::npos ||
-                    mass_spotify != std::string::npos ||
-                    mass_tidal != std::string::npos ||
-                    mass_tunein != std::string::npos ||
-                    mass_ytmusic != std::string::npos)) {
-              ESP_LOGD("tagreader", "Found Music Assistant tag NDEF");
-              id(source) = "mass";
-              id(url) = payload;
-            }
-            else if (type == "T" ) {
+            if (strcmp(type, "U") == 0) {
+              if (strncmp(payload, "https://www.home-assistant.io/tag/", 34) == 0) {
+                ESP_LOGD("tagreader", "Found Home Assistant tag NDEF");
+                id(source) = "hass";
+                id(url) = payload;
+                id(info) = payload + 34;
+              } else if (strncmp(payload, "https://music.apple.com", 23) == 0) {
+                ESP_LOGD("tagreader", "Found Apple Music tag NDEF");
+                id(source) = "amusic";
+                id(url) = payload;
+              } else if (strncmp(payload, "spotify:", 8) == 0) {
+                ESP_LOGD("tagreader", "Found Spotify tag NDEF");
+                id(source) = "spotify";
+                id(url) = payload;
+              } else if (strncmp(payload, "sonos-2://", 10) == 0) {
+                ESP_LOGD("tagreader", "Found Sonos app tag NDEF");
+                id(source) = "sonos";
+                id(url) = payload;
+              } else if (strncmp(payload, "deezer://", 9) == 0 ||
+                         strncmp(payload, "filesystem_local://", 19) == 0 ||
+                         strncmp(payload, "filesystem_smb://", 17) == 0 ||
+                         strncmp(payload, "plex://", 6) == 0 ||
+                         strncmp(payload, "qobuz://", 7) == 0 ||
+                         strncmp(payload, "radiobrowser://", 14) == 0 ||
+                         strncmp(payload, "soundcloud://", 12) == 0 ||
+                         strncmp(payload, "spotify://", 9) == 0 ||
+                         strncmp(payload, "tidal://", 7) == 0 ||
+                         strncmp(payload, "tunein://", 8) == 0 ||
+                         strncmp(payload, "ytmusic://", 9) == 0) {
+                ESP_LOGD("tagreader", "Found Music Assistant tag NDEF");
+                id(source) = "mass";
+                id(url) = payload;
+              }
+            } else if (strcmp(type, "T") == 0) {
               ESP_LOGD("tagreader", "Found music info tag NDEF");
-              id(info)=payload;
-            }
-            else if ( id(source)=="" ) {
-              id(source)="uid";
+              id(info) = payload;
+            } else if (id(source).empty()) {
+              id(source) = "uid";
             }
           }
-        }
-        else {
-          id(source)="uid";
+        } else {
+          id(source) = "uid";
         }
     
     - if:
