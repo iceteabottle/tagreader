@@ -32,7 +32,7 @@ esphome:
   # configuration and updates.
   project:
     name: adonno.tag_reader
-    version: "1.4.9"
+    version: "1.4.3"
 
   # If buzzer is enabled, notify on api connection success
   on_boot:
@@ -265,65 +265,63 @@ pn532_i2c:
             std::string payload = record->get_payload();
             std::string type = record->get_type();
 
-            if (type == "U") {
-              ESP_LOGD("tagreader", "Found URI NDEF");
+            ESP_LOGD("tagreader", "Payload: %s", payload.c_str());
+            ESP_LOGD("tagreader", "Type: %s", type.c_str());
+
+            size_t hass = payload.find("https://www.home-assistant.io/tag/");
+            size_t applemusic = payload.find("https://music.apple.com");
+            size_t spotify = payload.find("spotify:");
+            size_t sonos = payload.find("sonos-2://");
+
+            size_t mass_deezer = payload.find("deezer://");
+            size_t mass_filesystem_local = payload.find("filesystem_local://");
+            size_t mass_filesystem_smb = payload.find("filesystem_smb://");
+            size_t mass_plex = payload.find("plex://");
+            size_t mass_qobuz = payload.find("qobuz://");
+            size_t mass_radiobrowser = payload.find("radiobrowser://");
+            size_t mass_soundcloud = payload.find("soundcloud://");
+            size_t mass_spotify = payload.find("spotify://");
+            size_t mass_tidal = payload.find("tidal://");
+            size_t mass_tunein = payload.find("tunein://");
+            size_t mass_ytmusic = payload.find("ytmusic://");
+
+            if (type == "U" and hass != std::string::npos ) {
+              ESP_LOGD("tagreader", "Found Home Assistant tag NDEF");
+              id(source)="hass";
               id(url)=payload;
-
-              size_t hass = payload.find("https://www.home-assistant.io/tag/");
-              size_t applemusic = payload.find("https://music.apple.com");
-              size_t spotify = payload.find("spotify:");
-              size_t sonos = payload.find("sonos-2://");
-
-              size_t mass_deezer = payload.find("deezer://");
-              size_t mass_filesystem_local = payload.find("filesystem_local://");
-              size_t mass_filesystem_smb = payload.find("filesystem_smb://");
-              size_t mass_plex = payload.find("plex://");
-              size_t mass_qobuz = payload.find("qobuz://");
-              size_t mass_radiobrowser = payload.find("radiobrowser://");
-              size_t mass_soundcloud = payload.find("soundcloud://");
-              size_t mass_spotify = payload.find("spotify://");
-              size_t mass_tidal = payload.find("tidal://");
-              size_t mass_tunein = payload.find("tunein://");
-              size_t mass_ytmusic = payload.find("ytmusic://");
-
-              if (hass != std::string::npos) {
-                ESP_LOGD("tagreader", "Found Home Assistant tag NDEF");
-                id(source)="hass";
-                id(url)=payload;
-                id(info)=payload.substr(hass + 34);
-              }
-              else if (applemusic != std::string::npos) {
-                ESP_LOGD("tagreader", "Found Apple Music tag NDEF");
-                id(source)="amusic";
-                id(url)=payload;
-              }
-              else if (spotify != std::string::npos) {
-                ESP_LOGD("tagreader", "Found Spotify tag NDEF");
-                id(source)="spotify";
-                id(url)=payload;
-              }
-              else if (sonos != std::string::npos) {
-                ESP_LOGD("tagreader", "Found Sonos app tag NDEF");
-                id(source)="sonos";
-                id(url)=payload;
-              }
-              else if (mass_deezer != std::string::npos ||
-                      mass_filesystem_local != std::string::npos ||
-                      mass_filesystem_smb != std::string::npos ||
-                      mass_plex != std::string::npos ||
-                      mass_qobuz != std::string::npos ||
-                      mass_radiobrowser != std::string::npos ||
-                      mass_soundcloud != std::string::npos ||
-                      mass_spotify != std::string::npos ||
-                      mass_tidal != std::string::npos ||
-                      mass_tunein != std::string::npos ||
-                      mass_ytmusic != std::string::npos) {
-                ESP_LOGD("tagreader", "Found Music Assistant tag NDEF");
-                id(source) = "mass";
-                id(url) = payload;
-              }
+              id(info)=payload.substr(hass + 34);
             }
-            else if (type == "T") {
+            else if (type == "U" and applemusic != std::string::npos ) {
+              ESP_LOGD("tagreader", "Found Apple Music tag NDEF");
+              id(source)="amusic";
+              id(url)=payload;
+            }
+            else if (type == "U" and spotify != std::string::npos ) {
+              ESP_LOGD("tagreader", "Found Spotify tag NDEFx");
+              id(source)="spotify";
+              id(url)=payload;
+            }
+            else if (type == "U" and sonos != std::string::npos ) {
+              ESP_LOGD("tagreader", "Found Sonos app tag NDEF");
+              id(source)="sonos";
+              id(url)=payload;
+            }
+            else if (type == "U" && (mass_deezer != std::string::npos ||
+                    mass_filesystem_local != std::string::npos ||
+                    mass_filesystem_smb != std::string::npos ||
+                    mass_plex != std::string::npos ||
+                    mass_qobuz != std::string::npos ||
+                    mass_radiobrowser != std::string::npos ||
+                    mass_soundcloud != std::string::npos ||
+                    mass_spotify != std::string::npos ||
+                    mass_tidal != std::string::npos ||
+                    mass_tunein != std::string::npos ||
+                    mass_ytmusic != std::string::npos)) {
+              ESP_LOGD("tagreader", "Found Music Assistant tag NDEF");
+              id(source) = "mass";
+              id(url) = payload;
+            }
+            else if (type == "T" ) {
               ESP_LOGD("tagreader", "Found music info tag NDEF");
               id(info)=payload;
             }
