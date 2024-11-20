@@ -146,6 +146,7 @@ button:
 logger:
   # level: VERY_VERBOSE
   # level: VERBOSE
+  level: debug
 
 # Enable Home Assistant API
 api:
@@ -373,6 +374,24 @@ text_sensor:
       name: "${friendly_name} Connected SSID"
       icon: mdi:wifi-strength-2
       entity_category: diagnostic
+    - platform: debug
+      device:
+        name: "Device Info"
+      reset_reason:
+        name: "Reset Reason"
+
+sensor:
+  - platform: debug
+    free:
+      name: "Heap Free"
+    fragmentation:
+      name: "Heap Fragmentation"
+    block:
+      name: "Heap Max Block"
+    loop_time:
+      name: "Loop Time"
+    psram:
+      name: "Free PSRAM"
 
 # Define buzzer as output for RTTTL
 rtttl:
