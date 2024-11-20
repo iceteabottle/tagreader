@@ -19,6 +19,11 @@ substitutions:
   name: tagreader
   friendly_name: TagReader
 
+# Enable watchdog timer
+esp8266:
+  board: d1_mini
+  watchdog_timeout: 10s
+
 esphome:
   name: $name
   platform: ESP8266
@@ -32,7 +37,7 @@ esphome:
   # configuration and updates.
   project:
     name: adonno.tag_reader
-    version: "1.4.12"
+    version: "1.4.13"
 
   # If buzzer is enabled, notify on api connection success
   on_boot:
