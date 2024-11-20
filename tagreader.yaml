@@ -260,6 +260,23 @@ pn532_i2c:
         id(url).clear();
         id(info).clear();
         if (tag.has_ndef_message()) {
+          const char* prefixes[][2] = {
+            {"https://www.home-assistant.io/tag/", "hass"},
+            {"https://music.apple.com", "amusic"},
+            {"spotify:", "spotify"},
+            {"sonos-2://", "sonos"},
+            {"deezer://", "mass"},
+            {"filesystem_local://", "mass"},
+            {"filesystem_smb://", "mass"},
+            {"plex://", "mass"},
+            {"qobuz://", "mass"},
+            {"radiobrowser://", "mass"},
+            {"soundcloud://", "mass"},
+            {"spotify://", "mass"},
+            {"tidal://", "mass"},
+            {"tunein://", "mass"},
+            {"ytmusic://", "mass"}
+          };
           auto message = tag.get_ndef_message();
           auto records = message->get_records();
           for (auto &record : records) {
@@ -269,24 +286,6 @@ pn532_i2c:
             if (type == "U") {
               ESP_LOGD("tagreader", "Found URI NDEF");
               id(url) = payload;
-
-              const char* prefixes[][2] = {
-                {"https://www.home-assistant.io/tag/", "hass"},
-                {"https://music.apple.com", "amusic"},
-                {"spotify:", "spotify"},
-                {"sonos-2://", "sonos"},
-                {"deezer://", "mass"},
-                {"filesystem_local://", "mass"},
-                {"filesystem_smb://", "mass"},
-                {"plex://", "mass"},
-                {"qobuz://", "mass"},
-                {"radiobrowser://", "mass"},
-                {"soundcloud://", "mass"},
-                {"spotify://", "mass"},
-                {"tidal://", "mass"},
-                {"tunein://", "mass"},
-                {"ytmusic://", "mass"}
-              };
 
               for (const auto& prefix : prefixes) {
                 if (payload.find(prefix[0]) == 0) {
