@@ -30,4 +30,4 @@ condition:
 action:
   - action: media_player.media_pause
     target:
-      device_id: !input player
+      entity_id: !input player
