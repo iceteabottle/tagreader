@@ -24,7 +24,7 @@ blueprint:
         boolean: {}
 
 variables:
-    device_id: !input reader_id
+  device_id: !input reader_id
 
 trigger:
   - platform: event
@@ -32,7 +32,7 @@ trigger:
 
 condition:
   - condition: template
-    value_template: '{{ trigger.event.data.device_id == device_id }}'
+    value_template: "{{ trigger.event.data.device_id == device_id }}"
   - condition: template
     value_template: '{{ trigger.event.data.source == "spotify" }}'
 

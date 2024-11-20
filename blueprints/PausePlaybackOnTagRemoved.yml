@@ -17,7 +17,7 @@ blueprint:
           domain: media_player
 
 variables:
-    device_id: !input reader_id
+  device_id: !input reader_id
 
 trigger:
   - platform: event
@@ -25,7 +25,7 @@ trigger:
 
 condition:
   - condition: template
-    value_template: '{{ trigger.event.data.device_id == device_id }}'
+    value_template: "{{ trigger.event.data.device_id == device_id }}"
 
 action:
   - action: media_player.media_pause
