@@ -374,11 +374,11 @@ text_sensor:
       name: "${friendly_name} Connected SSID"
       icon: mdi:wifi-strength-2
       entity_category: diagnostic
-    - platform: debug
-      device:
-        name: "Device Info"
-      reset_reason:
-        name: "Reset Reason"
+  - platform: debug
+    device:
+      name: "Device Info"
+    reset_reason:
+      name: "Reset Reason"
 
 sensor:
   - platform: debug
@@ -392,6 +392,9 @@ sensor:
       name: "Loop Time"
     psram:
       name: "Free PSRAM"
+
+debug:
+  update_interval: 5s
 
 # Define buzzer as output for RTTTL
 rtttl:
