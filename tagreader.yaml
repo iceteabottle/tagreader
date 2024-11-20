@@ -32,8 +32,7 @@ esphome:
   # configuration and updates.
   project:
     name: adonno.tag_reader
-    version: "1.4.8"
-  
+    version: "1.4.9"
 
   # If buzzer is enabled, notify on api connection success
   on_boot:
@@ -256,27 +255,10 @@ pn532_i2c:
     - delay: 0.15s #to fix slow component
         
     - lambda: |-
-        id(source).clear();
-        id(url).clear();
-        id(info).clear();
+        id(source)="";
+        id(url)="";
+        id(info)="";
         if (tag.has_ndef_message()) {
-          const char* prefixes[][2] = {
-            {"https://www.home-assistant.io/tag/", "hass"},
-            {"https://music.apple.com", "amusic"},
-            {"spotify:", "spotify"},
-            {"sonos-2://", "sonos"},
-            {"deezer://", "mass"},
-            {"filesystem_local://", "mass"},
-            {"filesystem_smb://", "mass"},
-            {"plex://", "mass"},
-            {"qobuz://", "mass"},
-            {"radiobrowser://", "mass"},
-            {"soundcloud://", "mass"},
-            {"spotify://", "mass"},
-            {"tidal://", "mass"},
-            {"tunein://", "mass"},
-            {"ytmusic://", "mass"}
-          };
           auto message = tag.get_ndef_message();
           auto records = message->get_records();
           for (auto &record : records) {
@@ -285,29 +267,75 @@ pn532_i2c:
 
             if (type == "U") {
               ESP_LOGD("tagreader", "Found URI NDEF");
-              id(url) = payload;
+              id(url)=payload;
 
-              for (const auto& prefix : prefixes) {
-                if (payload.find(prefix[0]) == 0) {
-                  ESP_LOGD("tagreader", "Found %s tag NDEF", prefix[1]);
-                  id(source) = prefix[1];
-                  if (strcmp(prefix[1], "hass") == 0) {
-                    id(info) = payload.substr(strlen(prefix[0]));
-                  }
-                  break;
-                }
+              size_t hass = payload.find("https://www.home-assistant.io/tag/");
+              size_t applemusic = payload.find("https://music.apple.com");
+              size_t spotify = payload.find("spotify:");
+              size_t sonos = payload.find("sonos-2://");
+
+              size_t mass_deezer = payload.find("deezer://");
+              size_t mass_filesystem_local = payload.find("filesystem_local://");
+              size_t mass_filesystem_smb = payload.find("filesystem_smb://");
+              size_t mass_plex = payload.find("plex://");
+              size_t mass_qobuz = payload.find("qobuz://");
+              size_t mass_radiobrowser = payload.find("radiobrowser://");
+              size_t mass_soundcloud = payload.find("soundcloud://");
+              size_t mass_spotify = payload.find("spotify://");
+              size_t mass_tidal = payload.find("tidal://");
+              size_t mass_tunein = payload.find("tunein://");
+              size_t mass_ytmusic = payload.find("ytmusic://");
+
+              if (hass != std::string::npos) {
+                ESP_LOGD("tagreader", "Found Home Assistant tag NDEF");
+                id(source)="hass";
+                id(url)=payload;
+                id(info)=payload.substr(hass + 34);
               }
-            } else if (type == "T") {
+              else if (applemusic != std::string::npos) {
+                ESP_LOGD("tagreader", "Found Apple Music tag NDEF");
+                id(source)="amusic";
+                id(url)=payload;
+              }
+              else if (spotify != std::string::npos) {
+                ESP_LOGD("tagreader", "Found Spotify tag NDEF");
+                id(source)="spotify";
+                id(url)=payload;
+              }
+              else if (sonos != std::string::npos) {
+                ESP_LOGD("tagreader", "Found Sonos app tag NDEF");
+                id(source)="sonos";
+                id(url)=payload;
+              }
+              else if (mass_deezer != std::string::npos ||
+                      mass_filesystem_local != std::string::npos ||
+                      mass_filesystem_smb != std::string::npos ||
+                      mass_plex != std::string::npos ||
+                      mass_qobuz != std::string::npos ||
+                      mass_radiobrowser != std::string::npos ||
+                      mass_soundcloud != std::string::npos ||
+                      mass_spotify != std::string::npos ||
+                      mass_tidal != std::string::npos ||
+                      mass_tunein != std::string::npos ||
+                      mass_ytmusic != std::string::npos) {
+                ESP_LOGD("tagreader", "Found Music Assistant tag NDEF");
+                id(source) = "mass";
+                id(url) = payload;
+              }
+            }
+            else if (type == "T") {
               ESP_LOGD("tagreader", "Found music info tag NDEF");
-              id(info) = payload;
-            } else if (id(source).empty()) {
-              id(source) = "uid";
+              id(info)=payload;
+            }
+            else if ( id(source)=="" ) {
+              id(source)="uid";
             }
           }
-        } else {
-          id(source) = "uid";
         }
-
+        else {
+          id(source)="uid";
+        }
+    
     - if:
         condition:
           lambda: 'return ( id(source)=="uid" );'
