@@ -1,0 +1,33 @@
+blueprint:
+  name: Pause Playback on Tag Removed
+  description: Pause playback when the NFC tag is removed
+  domain: automation
+  input:
+    reader_id:
+      name: ESPHome NFC reader device
+      description: This is your NFC reader
+      selector:
+        device:
+          integration: esphome
+    player:
+      name: Media Player
+      description: This is your player you use for this reader
+      selector:
+        entity:
+          domain: media_player
+
+variables:
+    device_id: !input reader_id
+
+trigger:
+  - platform: event
+    event_type: esphome.tag_removed
+
+condition:
+  - condition: template
+    value_template: '{{ trigger.event.data.device_id == device_id }}'
+
+action:
+  - action: media_player.media_pause
+    target:
+      device_id: !input player
