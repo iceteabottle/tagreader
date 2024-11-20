@@ -32,7 +32,7 @@ esphome:
   # configuration and updates.
   project:
     name: adonno.tag_reader
-    version: "1.4.10"
+    version: "1.4.11"
 
   # If buzzer is enabled, notify on api connection success
   on_boot:
@@ -314,7 +314,7 @@ pn532_i2c:
     
     - if:
         condition:
-          lambda: 'return ( id(source)=="uid" );'
+          lambda: 'return (id(source) == "uid");'
         then:
           - homeassistant.tag_scanned: !lambda |-
               ESP_LOGD("tagreader", "No HA NDEF, using UID");
@@ -322,7 +322,7 @@ pn532_i2c:
         else:
         - if:
             condition:
-              lambda: 'return ( id(source)=="hass" );'
+              lambda: 'return (id(source) == "hass");'
             then:
             - homeassistant.tag_scanned: !lambda 'return id(info);'
             else:
@@ -332,11 +332,11 @@ pn532_i2c:
                   reader: !lambda |-
                     return App.get_name().c_str();
                   source: !lambda |-
-                    return id(source);
+                    return id(source).c_str();
                   url: !lambda |-
-                    return id(url);
+                    return id(url).c_str();
                   info: !lambda |-
-                    return id(info);
+                    return id(info).c_str();
     
     - if:
         condition:
@@ -347,6 +347,7 @@ pn532_i2c:
     then:
     - homeassistant.event:
         event: esphome.tag_removed
+
 # Define the buzzer output
 output:
 - platform: esp8266_pwm
