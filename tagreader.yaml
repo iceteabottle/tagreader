@@ -26,7 +26,6 @@ esp8266:
 
 esphome:
   name: $name
-  platform: ESP8266
   board: d1_mini
 
   # Automatically add the mac address to the name
