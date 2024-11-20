@@ -32,7 +32,7 @@ esphome:
   # configuration and updates.
   project:
     name: adonno.tag_reader
-    version: "1.4.11"
+    version: "1.4.12"
 
   # If buzzer is enabled, notify on api connection success
   on_boot:
@@ -265,9 +265,6 @@ pn532_i2c:
             const char* payload = record->get_payload().c_str();
             const char* type = record->get_type().c_str();
 
-            ESP_LOGD("tagreader", "Payload: %s", payload);
-            ESP_LOGD("tagreader", "Type: %s", type);
-
             if (strcmp(type, "U") == 0) {
               if (strncmp(payload, "https://www.home-assistant.io/tag/", 34) == 0) {
                 ESP_LOGD("tagreader", "Found Home Assistant tag NDEF");
@@ -286,17 +283,19 @@ pn532_i2c:
                 ESP_LOGD("tagreader", "Found Sonos app tag NDEF");
                 id(source) = "sonos";
                 id(url) = payload;
-              } else if (strncmp(payload, "deezer://", 9) == 0 ||
-                         strncmp(payload, "filesystem_local://", 19) == 0 ||
-                         strncmp(payload, "filesystem_smb://", 17) == 0 ||
-                         strncmp(payload, "plex://", 6) == 0 ||
-                         strncmp(payload, "qobuz://", 7) == 0 ||
-                         strncmp(payload, "radiobrowser://", 14) == 0 ||
-                         strncmp(payload, "soundcloud://", 12) == 0 ||
-                         strncmp(payload, "spotify://", 9) == 0 ||
-                         strncmp(payload, "tidal://", 7) == 0 ||
-                         strncmp(payload, "tunein://", 8) == 0 ||
-                         strncmp(payload, "ytmusic://", 9) == 0) {
+              } else if (
+                strncmp(payload, "deezer://", 9) == 0 ||
+                strncmp(payload, "filesystem_local://", 19) == 0 ||
+                strncmp(payload, "filesystem_smb://", 17) == 0 ||
+                strncmp(payload, "plex://", 6) == 0 ||
+                strncmp(payload, "qobuz://", 7) == 0 ||
+                strncmp(payload, "radiobrowser://", 14) == 0 ||
+                strncmp(payload, "soundcloud://", 12) == 0 ||
+                strncmp(payload, "spotify://", 9) == 0 ||
+                strncmp(payload, "tidal://", 7) == 0 ||
+                strncmp(payload, "tunein://", 8) == 0 ||
+                strncmp(payload, "ytmusic://", 9) == 0
+              ) {
                 ESP_LOGD("tagreader", "Found Music Assistant tag NDEF");
                 id(source) = "mass";
                 id(url) = payload;
