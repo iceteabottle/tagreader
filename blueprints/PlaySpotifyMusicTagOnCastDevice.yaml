@@ -1,6 +1,6 @@
 blueprint:
-  name: Play Spotify Music Tag on a cast device
-  description: Play Spotify music tag with Spotify uri on a cast device
+  name: Play and Pause Spotify Music Tag on a cast device
+  description: Play Spotify music tag with Spotify uri on a cast device and pause playback when the NFC tag is removed
   domain: automation
   input:
     reader_id:
@@ -29,19 +29,33 @@ variables:
 trigger:
   - platform: event
     event_type: esphome.music_tag
+  - platform: event
+    event_type: esphome.tag_removed
 
 condition:
   - condition: template
     value_template: "{{ trigger.event.data.device_id == device_id }}"
-  - condition: template
-    value_template: '{{ trigger.event.data.source == "spotify" }}'
 
 action:
-  - action: spotcast.start
-    data:
-      entity_id: !input player
-      uri: "{{ trigger.event.data.url }}"
-      random_song: !input shuffle
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: '{{ trigger.event.event_type == "esphome.music_tag" }}'
+          - condition: template
+            value_template: '{{ trigger.event.data.source == "spotify" }}'
+        sequence:
+          - action: spotcast.start
+            data:
+              entity_id: !input player
+              uri: "{{ trigger.event.data.url }}"
+              random_song: !input shuffle
+      - conditions:
+          - condition: template
+            value_template: '{{ trigger.event.event_type == "esphome.tag_removed" }}'
+        sequence:
+          - action: media_player.media_pause
+            target:
+              entity_id: !input player
 
 mode: queued
 max: 10
