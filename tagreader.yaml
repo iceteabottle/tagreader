@@ -358,12 +358,14 @@ binary_sensor:
     name: "${friendly_name} Status"
     entity_category: diagnostic
   - platform: gpio
-    pin: D5
+    pin:
+      number: D5
+      mode: INPUT_PULLUP
     id: play_pause_button
     name: "Play/Pause Button"
     filters:
-      - delayed_on: 5ms
-      - delayed_off: 5ms
+      - delayed_on: 50ms
+      - delayed_off: 50ms
     on_press:
       then:
         - homeassistant.event:
