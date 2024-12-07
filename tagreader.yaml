@@ -143,6 +143,7 @@ button:
     entity_category: config
 # Enable logging
 logger:
+  level: debug
   # level: VERY_VERBOSE
   # level: VERBOSE
 
