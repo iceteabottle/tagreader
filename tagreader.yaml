@@ -31,7 +31,7 @@ esphome:
   # configuration and updates.
   project:
     name: adonno.tag_reader
-    version: "1.4.15"
+    version: "1.4.16"
 
   # If buzzer is enabled, notify on api connection success
   on_boot:
@@ -361,6 +361,9 @@ binary_sensor:
     pin: D5
     id: play_pause_button
     name: "Play/Pause Button"
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
     on_press:
       then:
         - homeassistant.event:
