@@ -357,7 +357,7 @@ binary_sensor:
     name: "${friendly_name} Status"
     entity_category: diagnostic
   - platform: gpio
-    pin: D6
+    pin: D7
     id: play_pause_button
     name: "Play/Pause Button"
     on_press:
