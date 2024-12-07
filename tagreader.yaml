@@ -356,6 +356,14 @@ binary_sensor:
   - platform: status
     name: "${friendly_name} Status"
     entity_category: diagnostic
+  - platform: gpio
+    pin: D6
+    id: play_pause_button
+    name: "Play/Pause Button"
+    on_press:
+      then:
+        - homeassistant.event:
+            event: esphome.music_tag_play_pause
 
 text_sensor:
   - platform: version
