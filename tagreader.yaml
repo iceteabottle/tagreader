@@ -31,7 +31,7 @@ esphome:
   # configuration and updates.
   project:
     name: adonno.tag_reader
-    version: "1.4.14"
+    version: "1.4.15"
 
   # If buzzer is enabled, notify on api connection success
   on_boot:
