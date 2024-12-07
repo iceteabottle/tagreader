@@ -381,10 +381,10 @@ text_sensor:
       icon: mdi:wifi-strength-2
       entity_category: diagnostic
   - platform: debug
-      device:
-        name: "Device Info"
-      reset_reason:
-        name: "Reset Reason"
+    device:
+      name: "Device Info"
+    reset_reason:
+      name: "Reset Reason"
 
 sensor:
   - platform: debug
