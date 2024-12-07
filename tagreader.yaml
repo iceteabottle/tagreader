@@ -396,8 +396,9 @@ sensor:
       name: "Heap Max Block"
     loop_time:
       name: "Loop Time"
-    psram:
-      name: "Free PSRAM"
+
+debug:
+  update_interval: 5s
 
 # Define buzzer as output for RTTTL
 rtttl:
