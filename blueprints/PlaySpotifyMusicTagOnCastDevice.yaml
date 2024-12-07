@@ -56,6 +56,27 @@ action:
           - action: media_player.media_pause
             target:
               entity_id: !input player
+      - conditions:
+          - condition: template
+            value_template: '{{ trigger.event.event_type == "esphome.music_tag_play_pause" }}'
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: !input player
+                    state: 'playing'
+                sequence:
+                  - action: media_player.media_pause
+                    target:
+                      entity_id: !input player
+              - conditions:
+                  - condition: state
+                    entity_id: !input player
+                    state: 'paused'
+                sequence:
+                  - action: media_player.media_play
+                    target:
+                      entity_id: !input player
 
 mode: queued
 max: 10
