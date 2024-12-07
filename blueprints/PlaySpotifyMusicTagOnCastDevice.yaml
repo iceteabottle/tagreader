@@ -31,6 +31,8 @@ trigger:
     event_type: esphome.music_tag
   - platform: event
     event_type: esphome.tag_removed
+  - platform: event
+    event_type: esphome.music_tag_play_pause
 
 condition:
   - condition: template
