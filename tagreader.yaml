@@ -372,20 +372,7 @@ binary_sensor:
             event: esphome.music_tag_play_pause
   - platform: gpio
     pin:
-      number: D5
-      mode: INPUT_PULLUP
-    id: next_song_button
-    name: "Next Song Button"
-    filters:
-      - delayed_on: 50ms
-      - delayed_off: 50ms
-    on_press:
-      then:
-        - homeassistant.event:
-            event: esphome.music_tag_next_song
-  - platform: gpio
-    pin:
-      number: D0
+      number: D6
       mode: INPUT_PULLUP
     id: prev_song_button
     name: "Prev Song Button"
@@ -396,6 +383,19 @@ binary_sensor:
       then:
         - homeassistant.event:
             event: esphome.music_tag_prev_song
+  - platform: gpio
+    pin:
+      number: D7
+      mode: INPUT_PULLUP
+    id: next_song_button
+    name: "Next Song Button"
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    on_press:
+      then:
+        - homeassistant.event:
+            event: esphome.music_tag_next_song
   - platform: gpio
     pin:
       number: D3
