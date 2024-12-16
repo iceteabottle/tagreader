@@ -350,7 +350,7 @@ pn532_i2c:
 # Define the buzzer output
 output:
   - platform: esp8266_pwm
-    pin: D5
+    pin: D0
     id: buzzer
 
 binary_sensor:
@@ -465,7 +465,7 @@ rtttl:
 light:
   - platform: neopixelbus
     variant: WS2812
-    pin: D0
+    pin: D5
     num_leds: 1
     flash_transition_length: 500ms
     type: GRB
