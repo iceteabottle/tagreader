@@ -26,6 +26,7 @@ blueprint:
 variables:
   device_id: !input reader_id
   current_player: !input player
+  volume_step: 0.05
 
 trigger:
   - platform: event
@@ -109,7 +110,7 @@ action:
           - service: media_player.volume_set
             data:
               volume_level: >
-                {{ (state_attr(current_player, 'volume_level') | default(0)) + 0.05 }}
+                {{ (state_attr(current_player, 'volume_level') | default(0)) + volume_step }}
             target:
               entity_id: !input player
       - conditions:
@@ -119,7 +120,7 @@ action:
           - service: media_player.volume_set
             data:
               volume_level: >
-                {{ (state_attr(current_player, 'volume_level') | default(0)) - 0.05 }}
+                {{ (state_attr(current_player, 'volume_level') | default(0)) - volume_step }}
             target:
               entity_id: !input player
 
