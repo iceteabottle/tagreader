@@ -42,7 +42,7 @@ blueprint:
           step: 0.01
 
 variables:
-  device_id: !input reader_id
+  reader_id: !input reader_id
   player: !input player
   volume_step: !input volume_step
   max_volume: !input max_volume
@@ -65,7 +65,7 @@ trigger:
 
 condition:
   - condition: template
-    value_template: "{{ trigger.event.data.device_id == device_id }}"
+    value_template: "{{ trigger.event.data.device_id == reader_id }}"
 
 action:
   - choose:
