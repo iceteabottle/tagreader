@@ -359,7 +359,7 @@ binary_sensor:
     entity_category: diagnostic
   - platform: gpio
     pin:
-      number: D8
+      number: D5
       mode: INPUT_PULLUP
     id: play_pause_button
     name: "Play/Pause Button"
@@ -465,7 +465,7 @@ rtttl:
 light:
   - platform: neopixelbus
     variant: WS2812
-    pin: D5
+    pin: D8
     num_leds: 1
     flash_transition_length: 500ms
     type: GRB
