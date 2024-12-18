@@ -22,11 +22,30 @@ blueprint:
       default: true
       selector:
         boolean: {}
+    max_volume:
+      name: Maximum Volume
+      description: Set the maximum volume level
+      default: 1.0
+      selector:
+        number:
+          min: 0.0
+          max: 1.0
+          step: 0.01
+    volume_step:
+      name: Volume Step
+      description: Set the volume step
+      default: 0.05
+      selector:
+        number:
+          min: 0.0
+          max: 1.0
+          step: 0.01
 
 variables:
   device_id: !input reader_id
-  current_player: !input player
-  volume_step: 0.05
+  player: !input player
+  volume_step: !input volume_step
+  max_volume: !input max_volume
 
 trigger:
   - platform: event
@@ -110,7 +129,8 @@ action:
           - service: media_player.volume_set
             data:
               volume_level: >
-                {{ (state_attr(current_player, 'volume_level') | default(0)) + volume_step }}
+                {% set new_volume = (state_attr(player, 'volume_level') | default(0)) + volume_step %}
+                {{ [new_volume, max_volume] | min }}
             target:
               entity_id: !input player
       - conditions:
@@ -120,7 +140,8 @@ action:
           - service: media_player.volume_set
             data:
               volume_level: >
-                {{ (state_attr(current_player, 'volume_level') | default(0)) - volume_step }}
+                {% set new_volume = (state_attr(player, 'volume_level') | default(0)) - volume_step %}
+                {{ [new_volume, 0.0] | max }}
             target:
               entity_id: !input player
 
