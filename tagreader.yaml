@@ -352,6 +352,7 @@ output:
   - platform: esp8266_pwm
     pin: D0
     id: buzzer
+    inverted: true  # Invert the signal to ensure the buzzer is off at startup
 
 binary_sensor:
   - platform: status
