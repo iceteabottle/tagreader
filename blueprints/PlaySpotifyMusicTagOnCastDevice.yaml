@@ -33,6 +33,10 @@ trigger:
     event_type: esphome.tag_removed
   - platform: event
     event_type: esphome.music_tag_play_pause
+  - platform: event
+    event_type: esphome.music_tag_prev_song
+  - platform: event
+    event_type: esphome.music_tag_next_song
 
 condition:
   - condition: template
@@ -79,6 +83,20 @@ action:
                   - action: media_player.media_play
                     target:
                       entity_id: !input player
+      - conditions:
+        - condition: template
+          value_template: '{{ trigger.event.event_type == "esphome.music_tag_prev_song" }}'
+        sequence:
+          - action: media_player.media_previous_track
+            target:
+              entity_id: !input player
+      - conditions:
+          - condition: template
+            value_template: '{{ trigger.event.event_type == "esphome.music_tag_next_song" }}'
+        sequence:
+          - action: media_player.media_next_track
+            target:
+              entity_id: !input player
 
 mode: queued
 max: 10
