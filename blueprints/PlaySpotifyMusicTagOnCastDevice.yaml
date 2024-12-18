@@ -25,6 +25,7 @@ blueprint:
 
 variables:
   device_id: !input reader_id
+  current_player: !input player
 
 trigger:
   - platform: event
@@ -105,14 +106,20 @@ action:
           - condition: template
             value_template: '{{ trigger.event.event_type == "esphome.music_tag_increase_volume" }}'
         sequence:
-          - action: media_player.volume_up
+          - service: media_player.volume_set
+            data:
+              volume_level: >
+                {{ (state_attr(current_player, 'volume_level') | default(0)) + 0.05 }}
             target:
               entity_id: !input player
       - conditions:
           - condition: template
             value_template: '{{ trigger.event.event_type == "esphome.music_tag_decrease_volume" }}'
         sequence:
-          - action: media_player.volume_down
+          - service: media_player.volume_set
+            data:
+              volume_level: >
+                {{ (state_attr(current_player, 'volume_level') | default(0)) - 0.05 }}
             target:
               entity_id: !input player
 
