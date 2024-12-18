@@ -37,6 +37,10 @@ trigger:
     event_type: esphome.music_tag_prev_song
   - platform: event
     event_type: esphome.music_tag_next_song
+  - platform: event
+    event_type: esphome.music_tag_decrease_volume
+  - platform: event
+    event_type: esphome.music_tag_increase_volume
 
 condition:
   - condition: template
@@ -95,6 +99,20 @@ action:
             value_template: '{{ trigger.event.event_type == "esphome.music_tag_next_song" }}'
         sequence:
           - action: media_player.media_next_track
+            target:
+              entity_id: !input player
+      - conditions:
+          - condition: template
+            value_template: '{{ trigger.event.event_type == "esphome.music_tag_increase_volume" }}'
+        sequence:
+          - action: media_player.volume_up
+            target:
+              entity_id: !input player
+      - conditions:
+          - condition: template
+            value_template: '{{ trigger.event.event_type == "esphome.music_tag_decrease_volume" }}'
+        sequence:
+          - action: media_player.volume_down
             target:
               entity_id: !input player
 
