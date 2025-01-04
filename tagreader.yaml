@@ -266,38 +266,9 @@ pn532_i2c:
               const char* type = record->get_type().c_str();
 
               if (strcmp(type, "U") == 0) {
-                if (strncmp(payload, "https://www.home-assistant.io/tag/", 34) == 0) {
-                  ESP_LOGD("tagreader", "Found Home Assistant tag NDEF");
-                  id(source) = "hass";
-                  id(url) = payload;
-                  id(info) = payload + 34;
-                } else if (strncmp(payload, "https://music.apple.com", 23) == 0) {
-                  ESP_LOGD("tagreader", "Found Apple Music tag NDEF");
-                  id(source) = "amusic";
-                  id(url) = payload;
-                } else if (strncmp(payload, "spotify:", 8) == 0) {
+                if (strncmp(payload, "spotify:", 8) == 0) {
                   ESP_LOGD("tagreader", "Found Spotify tag NDEF");
                   id(source) = "spotify";
-                  id(url) = payload;
-                } else if (strncmp(payload, "sonos-2://", 10) == 0) {
-                  ESP_LOGD("tagreader", "Found Sonos app tag NDEF");
-                  id(source) = "sonos";
-                  id(url) = payload;
-                } else if (
-                  strncmp(payload, "deezer://", 9) == 0 ||
-                  strncmp(payload, "filesystem_local://", 19) == 0 ||
-                  strncmp(payload, "filesystem_smb://", 17) == 0 ||
-                  strncmp(payload, "plex://", 6) == 0 ||
-                  strncmp(payload, "qobuz://", 7) == 0 ||
-                  strncmp(payload, "radiobrowser://", 14) == 0 ||
-                  strncmp(payload, "soundcloud://", 12) == 0 ||
-                  strncmp(payload, "spotify://", 9) == 0 ||
-                  strncmp(payload, "tidal://", 7) == 0 ||
-                  strncmp(payload, "tunein://", 8) == 0 ||
-                  strncmp(payload, "ytmusic://", 9) == 0
-                ) {
-                  ESP_LOGD("tagreader", "Found Music Assistant tag NDEF");
-                  id(source) = "mass";
                   id(url) = payload;
                 }
               } else if (strcmp(type, "T") == 0) {
