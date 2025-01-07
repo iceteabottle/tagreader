@@ -130,6 +130,3 @@ action:
                 {{ [new_volume, 0.0] | max }}
             target:
               entity_id: !input player
-
-mode: queued
-max: 10
