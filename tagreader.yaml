@@ -141,6 +141,7 @@ button:
   - platform: restart
     name: "${friendly_name} Restart"
     entity_category: config
+
 # Enable logging
 logger:
   # level: debug
@@ -202,14 +203,9 @@ api:
         - lambda: |-
             auto message = new nfc::NdefMessage();
             std::string uri = "";
-            std::string text = "";
             uri += music_url;
-            text += music_info;
-            if ( music_url != "" ) {
+            if (music_url != "") {
               message->add_uri_record(uri);
-            }
-            if ( music_info != "" ) {
-              message->add_text_record(text);
             }
             id(pn532_board).write_mode(message);
         - rtttl.play: "write:d=24,o=5,b=100:b"
@@ -270,10 +266,14 @@ pn532_i2c:
                   ESP_LOGD("tagreader", "Found Spotify tag NDEF");
                   id(source) = "spotify";
                   id(url) = payload;
+                } else if (strncmp(payload, "https://www.home-assistant.io/tag/", 34) == 0) {
+                  ESP_LOGD("tagreader", "Found Home Assistant tag NDEF");
+                  id(source) = "hass";
+                  id(url) = payload;
+                  id(info) = payload + 34;
+                } else {
+                  ESP_LOGD("tagreader", "Unknown tag NDEF");
                 }
-              } else if (strcmp(type, "T") == 0) {
-                ESP_LOGD("tagreader", "Found music info tag NDEF");
-                id(info) = payload;
               } else if (id(source).empty()) {
                 id(source) = "uid";
               }
@@ -305,8 +305,6 @@ pn532_i2c:
                           return id(source).c_str();
                         url: !lambda |-
                           return id(url).c_str();
-                        info: !lambda |-
-                          return id(info).c_str();
 
       - if:
           condition:
@@ -324,6 +322,7 @@ output:
     pin: D0
     id: buzzer
 
+# Define the buttons
 binary_sensor:
   - platform: status
     name: "${friendly_name} Status"
