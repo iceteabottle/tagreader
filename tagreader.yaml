@@ -30,8 +30,8 @@ esphome:
   # This will allow for (future) project identification,
   # configuration and updates.
   project:
-    name: adonno.tag_reader
-    version: "1.4.16"
+    name: iceteabottle.tag_reader
+    version: "1.0.0"
 
   # If buzzer is enabled, notify on api connection success
   on_boot:
