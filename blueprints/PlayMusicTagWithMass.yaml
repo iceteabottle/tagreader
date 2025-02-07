@@ -1,6 +1,6 @@
 blueprint:
-  name: Play and Pause Spotify Music Tag on a cast device
-  description: Play Spotify music tag with Spotify uri on a cast device and pause playback when the NFC tag is removed
+  name: Play and Pause Music Tag with Music Assistant (MASS)
+  description: Play music tag with e.g. Spotify uri with MASS and pause playback when the NFC tag is removed
   domain: automation
   input:
     reader_id:
@@ -11,11 +11,11 @@ blueprint:
           integration: esphome
     player:
       name: Media Player
-      description: This is your cast media player for this reader
+      description: This is your media player device in MASS for this reader
       selector:
         entity:
           domain: media_player
-          integration: cast
+          integration: mass
     shuffle:
       name: Shuffle
       description: Enable shuffle mode
@@ -75,11 +75,11 @@ action:
           - condition: template
             value_template: '{{ trigger.event.data.source == "spotify" }}'
         sequence:
-          - action: spotcast.start
+          - action: music_assistant.play_media
             data:
+              media_id: "{{ trigger.event.data.url }}"
+            target:
               entity_id: !input player
-              uri: "{{ trigger.event.data.url }}"
-              random_song: !input shuffle
       - conditions:
           - condition: template
             value_template: '{{ trigger.event.event_type == "esphome.tag_removed" }}'
