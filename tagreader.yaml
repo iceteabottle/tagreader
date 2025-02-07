@@ -192,7 +192,6 @@ api:
     - service: write_music_tag
       variables:
         music_url: string
-        music_info: string
       then:
         - light.turn_on:
             id: activity_led
