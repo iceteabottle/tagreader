@@ -15,7 +15,7 @@ blueprint:
       selector:
         entity:
           domain: media_player
-          integration: mass
+          integration: music_assistant
     shuffle:
       name: Shuffle
       description: Enable shuffle mode
