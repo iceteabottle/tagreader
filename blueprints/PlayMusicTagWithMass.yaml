@@ -49,7 +49,7 @@ variables:
 
 trigger:
   - platform: event
-    event_type: esphome.tag_scanned
+    event_type: esphome.nfc_tag
   - platform: event
     event_type: esphome.tag_removed
   - platform: event
@@ -71,7 +71,7 @@ action:
   - choose:
       - conditions:
           - condition: template
-            value_template: '{{ trigger.event.event_type == "esphome.tag_scanned" }}'
+            value_template: '{{ trigger.event.event_type == "esphome.nfc_tag" }}'
         sequence:
           - action: music_assistant.play_media
             data:
