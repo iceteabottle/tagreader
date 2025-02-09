@@ -49,7 +49,7 @@ variables:
 
 trigger:
   - platform: event
-    event_type: esphome.music_tag
+    event_type: esphome.tag_scanned
   - platform: event
     event_type: esphome.tag_removed
   - platform: event
@@ -71,9 +71,7 @@ action:
   - choose:
       - conditions:
           - condition: template
-            value_template: '{{ trigger.event.event_type == "esphome.music_tag" }}'
-          - condition: template
-            value_template: '{{ trigger.event.data.source == "spotify" }}'
+            value_template: '{{ trigger.event.event_type == "esphome.tag_scanned" }}'
         sequence:
           - action: music_assistant.play_media
             data:
