@@ -269,20 +269,22 @@ pn532_i2c:
             ESP_LOGD("tagreader", "No NDEF found");
           }
 
+      - homeassistant.event:
+          event: esphome.nfc_tag
+          data:
+            reader: !lambda |-
+              return App.get_name().c_str();
+            url: !lambda |-
+              return id(url).c_str();
+            info: !lambda |-
+              return id(info).c_str();
+
       - if:
           condition:
             switch.is_on: buzzer_enabled
           then:
             - rtttl.play: "success:d=24,o=5,b=100:c,g,b"
-            - homeassistant.event:
-                event: esphome.music_tag
-                data:
-                  reader: !lambda |-
-                    return App.get_name().c_str();
-                  url: !lambda |-
-                    return id(url).c_str();
-                  info: !lambda |-
-                    return id(info).c_str();
+
   on_tag_removed:
     then:
       - homeassistant.event:
