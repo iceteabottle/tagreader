@@ -275,7 +275,7 @@ pn532_i2c:
           then:
             - rtttl.play: "success:d=24,o=5,b=100:c,g,b"
             - homeassistant.event:
-                event: esphome.tag_scanned
+                event: esphome.music_tag
                 data:
                   reader: !lambda |-
                     return App.get_name().c_str();
