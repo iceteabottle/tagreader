@@ -73,22 +73,20 @@ action:
           - condition: template
             value_template: '{{ trigger.event.event_type == "esphome.nfc_tag" }}'
           - condition: template
-            value_template: '{{ "https://www.home-assistant.io/tag/" not in trigger.event.data.url }}'
+            value_template: '{{ "https://www.home-assistant.io/tag/" in trigger.event.data.url }}'
+        sequence:
+          - event: tag_scanned
+            event_data:
+              tag_id: '{{ trigger.event.data.url.split("/")[-1] }}'
+      - conditions:
+          - condition: template
+            value_template: '{{ trigger.event.event_type == "esphome.nfc_tag" }}'
         sequence:
           - action: music_assistant.play_media
             data:
               media_id: "{{ trigger.event.data.url }}"
             target:
               entity_id: !input player
-      - conditions:
-          - condition: template
-            value_template: '{{ trigger.event.event_type == "esphome.nfc_tag" }}'
-          - condition: template
-            value_template: '{{ "https://www.home-assistant.io/tag/" in trigger.event.data.url }}'
-        sequence:
-          - event: tag_scanned
-            event_data:
-              tag_id: '{{ trigger.event.data.url.split("/")[-1] }}'
       - conditions:
           - condition: template
             value_template: '{{ trigger.event.event_type == "esphome.tag_removed" }}'
