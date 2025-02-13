@@ -16,12 +16,6 @@ blueprint:
         entity:
           domain: media_player
           integration: music_assistant
-    shuffle:
-      name: Shuffle
-      description: Enable shuffle mode
-      default: true
-      selector:
-        boolean: {}
     max_volume:
       name: Maximum Volume
       description: Set the maximum volume level
@@ -40,16 +34,23 @@ blueprint:
           min: 0.0
           max: 1.0
           step: 0.01
+    last_scanned_tag_uri:
+      name: Last Scanned Tag URI
+      description: Input text helper to store the last scanned tag URI
+      selector:
+        entity:
+          domain: input_text
 
 variables:
   reader_id: !input reader_id
   player: !input player
   volume_step: !input volume_step
   max_volume: !input max_volume
+  last_scanned_tag_uri: !input last_scanned_tag_uri
 
 trigger:
   - platform: event
-    event_type: esphome.music_tag
+    event_type: esphome.nfc_tag
   - platform: event
     event_type: esphome.tag_removed
   - platform: event
@@ -71,18 +72,40 @@ action:
   - choose:
       - conditions:
           - condition: template
-            value_template: '{{ trigger.event.event_type == "esphome.music_tag" }}'
+            value_template: '{{ trigger.event.event_type == "esphome.nfc_tag" }}'
           - condition: template
-            value_template: '{{ trigger.event.data.source == "spotify" }}'
+            value_template: '{{ "https://www.home-assistant.io/tag/" in trigger.event.data.url }}'
         sequence:
-          - action: music_assistant.play_media
-            data:
-              media_id: "{{ trigger.event.data.url }}"
-            target:
-              entity_id: !input player
+          - event: tag_scanned
+            event_data:
+              tag_id: '{{ trigger.event.data.url.split("/")[-1] }}'
       - conditions:
           - condition: template
-            value_template: '{{ trigger.event.event_type == "esphome.tag_removed" }}'
+            value_template: '{{ trigger.event.event_type == "esphome.nfc_tag" }}'
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: >
+                      {{ states(player) == "paused" and trigger.event.data.url == states(last_scanned_tag_uri) }}
+                sequence:
+                  - service: media_player.media_play
+                    target:
+                      entity_id: !input player  
+            default:
+              sequence:
+                - service: input_text.set_value
+                  data:
+                    entity_id: !input last_scanned_tag_uri
+                    value: '{{ trigger.event.data.url }}'
+                - service: music_assistant.play_media
+                  data:
+                    media_id: "{{ trigger.event.data.url }}"
+                  target:
+                    entity_id: !input player
+      - conditions:
+          - condition: template
+            value_template: '{{ trigger.event.event_type == "esphome.tag_removed" and states(player) == "playing" }}'
         sequence:
           - action: media_player.media_pause
             target:
@@ -95,8 +118,8 @@ action:
             target:
               entity_id: !input player
       - conditions:
-        - condition: template
-          value_template: '{{ trigger.event.event_type == "esphome.music_tag_prev_song" }}'
+          - condition: template
+            value_template: '{{ trigger.event.event_type == "esphome.music_tag_prev_song" }}'
         sequence:
           - action: media_player.media_previous_track
             target:

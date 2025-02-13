@@ -224,8 +224,6 @@ i2c:
   frequency: 400kHz
 
 globals:
-  - id: source
-    type: std::string
   - id: url
     type: std::string
   - id: info
@@ -250,7 +248,6 @@ pn532_i2c:
       - delay: 0.15s #to fix slow component
 
       - lambda: |-
-          id(source).clear();
           id(url).clear();
           id(info).clear();
           if (tag.has_ndef_message()) {
@@ -261,55 +258,33 @@ pn532_i2c:
               const char* type = record->get_type().c_str();
 
               if (strcmp(type, "U") == 0) {
-                if (strncmp(payload, "spotify:", 8) == 0) {
-                  ESP_LOGD("tagreader", "Found Spotify tag NDEF");
-                  id(source) = "spotify";
-                  id(url) = payload;
-                } else if (strncmp(payload, "https://www.home-assistant.io/tag/", 34) == 0) {
-                  ESP_LOGD("tagreader", "Found Home Assistant tag NDEF");
-                  id(source) = "hass";
-                  id(url) = payload;
-                  id(info) = payload + 34;
-                } else {
-                  ESP_LOGD("tagreader", "Unknown tag NDEF");
-                }
-              } else if (id(source).empty()) {
-                id(source) = "uid";
+                ESP_LOGD("tagreader", "Found url NDEF");
+                id(url) = payload;
+              } else if (strcmp(type, "T") == 0) {
+                ESP_LOGD("tagreader", "Found text NDEF");
+                id(info) = payload;
               }
             }
           } else {
-            id(source) = "uid";
+            ESP_LOGD("tagreader", "No NDEF found");
           }
 
-      - if:
-          condition:
-            lambda: 'return (id(source) == "uid");'
-          then:
-            - homeassistant.tag_scanned: !lambda |-
-                ESP_LOGD("tagreader", "No HA NDEF, using UID");
-                return x;
-          else:
-            - if:
-                condition:
-                  lambda: 'return (id(source) == "hass");'
-                then:
-                  - homeassistant.tag_scanned: !lambda "return id(info);"
-                else:
-                  - homeassistant.event:
-                      event: esphome.music_tag
-                      data:
-                        reader: !lambda |-
-                          return App.get_name().c_str();
-                        source: !lambda |-
-                          return id(source).c_str();
-                        url: !lambda |-
-                          return id(url).c_str();
+      - homeassistant.event:
+          event: esphome.nfc_tag
+          data:
+            reader: !lambda |-
+              return App.get_name().c_str();
+            url: !lambda |-
+              return id(url).c_str();
+            info: !lambda |-
+              return id(info).c_str();
 
       - if:
           condition:
             switch.is_on: buzzer_enabled
           then:
             - rtttl.play: "success:d=24,o=5,b=100:c,g,b"
+
   on_tag_removed:
     then:
       - homeassistant.event:
