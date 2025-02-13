@@ -102,20 +102,18 @@ action:
                         tag url: {{ trigger.event.data.url }}, {{ states(last_scanned_tag_uri) }}
                   - service: media_player.media_play
                     target:
-                      entity_id: !input player
-              - conditions:
-                  - condition: template
-                    value_template: '{{ trigger.event.data.url != states(last_scanned_tag_uri) }}'
-                sequence:
-                  - service: input_text.set_value
-                    data:
-                      entity_id: !input last_scanned_tag_uri
-                      value: '{{ trigger.event.data.url }}'
-                  - service: music_assistant.play_media
-                    data:
-                      media_id: "{{ trigger.event.data.url }}"
-                    target:
-                      entity_id: !input player
+                      entity_id: !input player  
+            default:
+              sequence:
+                - service: input_text.set_value
+                  data:
+                    entity_id: !input last_scanned_tag_uri
+                    value: '{{ trigger.event.data.url }}'
+                - service: music_assistant.play_media
+                  data:
+                    media_id: "{{ trigger.event.data.url }}"
+                  target:
+                    entity_id: !input player
       - conditions:
           - condition: template
             value_template: '{{ trigger.event.event_type == "esphome.tag_removed" and states(player) == "playing" }}'
