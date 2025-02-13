@@ -16,12 +16,6 @@ blueprint:
         entity:
           domain: media_player
           integration: music_assistant
-    shuffle:
-      name: Shuffle
-      description: Enable shuffle mode
-      default: true
-      selector:
-        boolean: {}
     max_volume:
       name: Maximum Volume
       description: Set the maximum volume level
