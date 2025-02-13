@@ -95,11 +95,6 @@ action:
                     value_template: >
                       {{ states(player) == "paused" and trigger.event.data.url == states(last_scanned_tag_uri) }}
                 sequence:
-                  - service: logbook.log
-                    data:
-                      name: "Play Music Tag"
-                      message: >
-                        tag url: {{ trigger.event.data.url }}, {{ states(last_scanned_tag_uri) }}
                   - service: media_player.media_play
                     target:
                       entity_id: !input player  
