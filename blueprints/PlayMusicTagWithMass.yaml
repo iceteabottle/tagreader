@@ -40,12 +40,19 @@ blueprint:
           min: 0.0
           max: 1.0
           step: 0.01
+    last_scanned_tag_uri:
+      name: Last Scanned Tag URI
+      description: Input text helper to store the last scanned tag URI
+      selector:
+        entity:
+          domain: input_text
 
 variables:
   reader_id: !input reader_id
   player: !input player
   volume_step: !input volume_step
   max_volume: !input max_volume
+  last_scanned_tag_uri: !input last_scanned_tag_uri
 
 trigger:
   - platform: event
@@ -82,14 +89,36 @@ action:
           - condition: template
             value_template: '{{ trigger.event.event_type == "esphome.nfc_tag" }}'
         sequence:
-          - action: music_assistant.play_media
-            data:
-              media_id: "{{ trigger.event.data.url }}"
-            target:
-              entity_id: !input player
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: >
+                      {{ states(player) == "paused" and trigger.event.data.url == states(last_scanned_tag_uri) }}
+                sequence:
+                  - service: logbook.log
+                    data:
+                      name: "Play Music Tag"
+                      message: >
+                        tag url: {{ trigger.event.data.url }}, {{ states(last_scanned_tag_uri) }}
+                  - service: media_player.media_play
+                    target:
+                      entity_id: !input player
+              - conditions:
+                  - condition: template
+                    value_template: '{{ trigger.event.data.url != states(last_scanned_tag_uri) }}'
+                sequence:
+                  - service: input_text.set_value
+                    data:
+                      entity_id: !input last_scanned_tag_uri
+                      value: '{{ trigger.event.data.url }}'
+                  - service: music_assistant.play_media
+                    data:
+                      media_id: "{{ trigger.event.data.url }}"
+                    target:
+                      entity_id: !input player
       - conditions:
           - condition: template
-            value_template: '{{ trigger.event.event_type == "esphome.tag_removed" }}'
+            value_template: '{{ trigger.event.event_type == "esphome.tag_removed" and states(player) == "playing" }}'
         sequence:
           - action: media_player.media_pause
             target:
