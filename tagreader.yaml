@@ -1,8 +1,7 @@
 # Insert your SSID and Your PWD after inital setup
 wifi:
-  # networks:
-  #    - ssid: 'REPLACEME'          # Enter your WiFi SSID here. Example: `ssid: 'your_network_name'`
-  #      password: 'REPLACEME'      # Enter your wifi password here. Example: `password: 'abcde123456'`
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
   ap:
     ssid: ${name}
 
@@ -73,7 +72,6 @@ button:
   - platform: template
     name: Write Tag Random
     id: write_tag_random
-    # Optional variables:
     icon: "mdi:pencil-box"
     on_press:
       then:
@@ -137,7 +135,6 @@ button:
         - light.turn_off:
             id: activity_led
         - rtttl.play: "write:d=24,o=5,b=100:b,b"
-
   - platform: restart
     name: "${friendly_name} Restart"
     entity_category: config
@@ -228,6 +225,8 @@ globals:
     type: std::string
   - id: info
     type: std::string
+  - id: last_scanned_tag_uri
+    type: std::string
 
 pn532_i2c:
   id: pn532_board
@@ -260,6 +259,7 @@ pn532_i2c:
               if (strcmp(type, "U") == 0) {
                 ESP_LOGD("tagreader", "Found url NDEF");
                 id(url) = payload;
+                id(last_scanned_tag_uri) = payload; // Set the last scanned tag URI
               } else if (strcmp(type, "T") == 0) {
                 ESP_LOGD("tagreader", "Found text NDEF");
                 id(info) = payload;
@@ -381,6 +381,11 @@ text_sensor:
       name: "${friendly_name} Connected SSID"
       icon: mdi:wifi-strength-2
       entity_category: diagnostic
+  - platform: template
+    name: "Last Scanned Tag URI"
+    id: last_scanned_tag_uri_sensor
+    lambda: |-
+      return {id(last_scanned_tag_uri)};
 #   - platform: debug
 #     device:
 #       name: "Device Info"
