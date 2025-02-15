@@ -225,6 +225,8 @@ globals:
     type: std::string
   - id: info
     type: std::string
+  - id: last_scanned_tag_uri
+    type: std::string
 
 pn532_i2c:
   id: pn532_board
@@ -413,3 +415,10 @@ light:
     id: activity_led
     name: "${friendly_name} LED"
     restore_mode: ALWAYS_OFF
+
+sensor:
+  - platform: template
+    name: "Last Scanned Tag URI"
+    id: last_scanned_tag_uri_sensor
+    lambda: |-
+      return id(last_scanned_tag_uri).c_str();
