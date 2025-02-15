@@ -259,6 +259,7 @@ pn532_i2c:
               if (strcmp(type, "U") == 0) {
                 ESP_LOGD("tagreader", "Found url NDEF");
                 id(url) = payload;
+                id(last_scanned_tag_uri) = payload; // Set the last scanned tag URI
               } else if (strcmp(type, "T") == 0) {
                 ESP_LOGD("tagreader", "Found text NDEF");
                 id(info) = payload;
