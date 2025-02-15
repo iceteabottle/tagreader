@@ -80,7 +80,7 @@ action:
               - conditions:
                   - condition: template
                     value_template: >
-                      {{ states(player) == "paused" and trigger.event.data.url == states('sensor.last_scanned_tag_uri') }}
+                      {{ states(player) == "paused" and trigger.event.data.url == states('text_sensor.last_scanned_tag_uri') }}
                 sequence:
                   - service: media_player.media_play
                     target:
