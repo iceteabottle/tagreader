@@ -62,6 +62,11 @@ condition:
     value_template: "{{ trigger.event.data.device_id == reader_id }}"
 
 action:
+  - service: logbook.log
+    data:
+      name: "Tagreader event"
+      message: >
+        "Tag scanned (url: {{ trigger.event.data.url }})"
   - choose:
       - conditions:
           - condition: template
@@ -80,16 +85,13 @@ action:
               - conditions:
                   - condition: template
                     value_template: >
-                      {{ states(player) == "paused" and trigger.event.data.url == states('text_sensor.last_scanned_tag_uri') }}
+                      {{ states(player) == "paused" and trigger.event.data.url == states('sensor.last_scanned_tag_uri') }}
                 sequence:
                   - service: media_player.media_play
                     target:
                       entity_id: !input player  
             default:
               sequence:
-                - service: esphome.tagreader_last_scanned_tag_uri
-                  data:
-                    value: '{{ trigger.event.data.url }}'
                 - service: music_assistant.play_media
                   data:
                     media_id: "{{ trigger.event.data.url }}"
